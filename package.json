@@ -1,0 +1,15 @@
+{
+  "name": "cli-yelp",
+  "version": "1.0.0",
+  "description": "a cli based yelp app that interfaces a sharded MongoDB cluster of 5 AWS EC2 nodes",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "inquirer": "^8.0.0",
+    "mongoose": "^5.12.5"
+  }
+}
