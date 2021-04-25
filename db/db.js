@@ -1,6 +1,6 @@
-// makes a connection to MongoDB, locally or remotely
 const mongoose = require('mongoose');
 
+// makes a connection to MongoDB, locally or remotely
 function connectToMongo(callbackFunction) {
   mongoose
     // TODO: conditional connection URI, localhost if dev, EC2 ipv4 dns if "prod"
