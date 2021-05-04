@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const BusinessSchema = new mongoose.Schema({
   business_id: String,
   name: String,
+  address: String,
   city: String,
   state: String,
   postal_code: String,

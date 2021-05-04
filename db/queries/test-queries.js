@@ -1,4 +1,8 @@
-const Business = require('./business');
+const Business = require('../schemas/business');
+
+/**
+ * Test queries for intermediate report, interfaces businesses collection
+ */
 
 async function seeFirstTenDocuments() {
   const response = await Business.find({}).sort({ _id: 1 }).limit(10);
@@ -26,6 +30,7 @@ async function insertSampleDocument() {
 
 async function deleteDocument() {
   const documentToDelete = await Business.find({}).sort({ _id: -1 }).limit(1);
+  console.log(documentToDelete)
   const response = await Business.deleteOne({ _id: documentToDelete._id });
   return response;
 }
@@ -33,7 +38,8 @@ async function deleteDocument() {
 async function updateDocument() {
   const documentToUpdate = await Business.find({}).sort({ _id: -1 }).limit(1);
   console.log('Document that will be updated:\n', documentToUpdate);
-  const response = await Business.update(
+  console.log("\nField that will be updated:\naddress: '123456789 Test Street'\n")
+  const response = await Business.updateOne(
     { _id: documentToUpdate._id },
     { address: '123456789 Test Street' }
   );
