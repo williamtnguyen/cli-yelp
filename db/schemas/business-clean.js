@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 
-const pointSchema = new mongoose.Schema({
+// GeoJSON point
+const PointSchema = new mongoose.Schema({
   type: {
     type: String,
     enum: ['Point'],
@@ -19,7 +20,7 @@ const BusinessSchema = new mongoose.Schema({
   city: String,
   state: String,
   postal_code: String,
-  location: pointSchema,
+  location: PointSchema,
   stars: Number,
   review_count: Number,
   is_open: Number,
