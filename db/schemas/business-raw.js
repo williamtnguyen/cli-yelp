@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 
+// schema before transforming lat/lng to geojson
 const BusinessSchema = new mongoose.Schema({
   business_id: String,
   name: String,
@@ -17,4 +18,4 @@ const BusinessSchema = new mongoose.Schema({
   hours: { type: mongoose.Schema.Types.Mixed, required: false }, // arbitrary object
 });
 
-module.exports = mongoose.model('Business', BusinessSchema);
+module.exports = mongoose.model('BusinessRaw', BusinessSchema);
