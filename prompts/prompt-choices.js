@@ -31,10 +31,10 @@ const reviewFilterChoices = [
   { name: 'Location' },
   { name: 'Average star rating' }, // location 2 options
   { name: 'Bad review sentiment' },
-  { name: 'Date range start (e.g., date X to present)' }, // still needa make prompt for this
+  { name: 'Posted after date X' }, // still needa make prompt for this
   { name: 'Has delivery service' },
   { name: 'Serves alcohol' },
-]
+];
 const locationChoices = {
   stateCode: '2 character state code',
   postalCode: 'Postal code',
@@ -46,5 +46,5 @@ module.exports = {
   browseCategoryChoices,
   locationChoices,
   businessFilterChoices,
-  reviewFilterChoices
+  reviewFilterChoices,
 };

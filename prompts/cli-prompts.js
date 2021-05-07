@@ -8,6 +8,8 @@ const {
   locationChoices,
 } = require('./prompt-choices');
 const handleTestQuery = require('../db/query-handlers/test-query-handler');
+const handleBusinessQuery = require('../db/query-handlers/business-query-handler');
+const handleReviewQuery = require('../db/query-handlers/review-query-handler');
 
 console.log('Welcome to CLI Yelp!\n');
 
@@ -33,8 +35,8 @@ const prompts = [
     choices: Object.values(browseCategoryChoices),
     when: function (answers) {
       return (
-        answers.initUserFlow === initUserFlowChoices.businesses
-        || answers.initUserFlow === initUserFlowChoices.reviews
+        answers.initUserFlow === initUserFlowChoices.businesses ||
+        answers.initUserFlow === initUserFlowChoices.reviews
       );
     },
   },
@@ -53,7 +55,7 @@ const prompts = [
     message: 'Want to apply query filters?',
     when: function (answers) {
       return answers.initUserFlow === initUserFlowChoices.businesses;
-    }
+    },
   },
   {
     type: 'checkbox',
@@ -61,9 +63,11 @@ const prompts = [
     message: 'Choose 1 or more filters to apply.',
     choices: businessFilterChoices,
     when: function (answers) {
-      return answers.initUserFlow === initUserFlowChoices.businesses
-      && answers.isApplyingFilter;
-    }
+      return (
+        answers.initUserFlow === initUserFlowChoices.businesses &&
+        answers.isApplyingFilter
+      );
+    },
   },
   {
     type: 'checkbox',
@@ -71,8 +75,8 @@ const prompts = [
     message: 'Choose 1 or more filters to apply.',
     choices: reviewFilterChoices,
     when: function (answers) {
-      return answers.initUserFlow === initUserFlowChoices.reviews
-    }
+      return answers.initUserFlow === initUserFlowChoices.reviews;
+    },
   },
   {
     type: 'list',
@@ -81,16 +85,11 @@ const prompts = [
     choices: Object.values(locationChoices),
     when: function (answers) {
       return (
-        (
-          answers.initUserFlow === initUserFlowChoices.businesses
-          && answers.isApplyingFilter
-          && answers.appliedBusinessFilters.indexOf('Location') !== -1
-        )
-        ||
-        (
-          answers.initUserFlow === initUserFlowChoices.reviews
-          && answers.appliedReviewFilters.indexOf('Location') !== -1
-        )
+        (answers.initUserFlow === initUserFlowChoices.businesses &&
+          answers.isApplyingFilter &&
+          answers.appliedBusinessFilters.indexOf('Location') !== -1) ||
+        (answers.initUserFlow === initUserFlowChoices.reviews &&
+          answers.appliedReviewFilters.indexOf('Location') !== -1)
       );
     },
   },
@@ -100,21 +99,14 @@ const prompts = [
     message: 'Please enter 2 character state code:',
     when: function (answers) {
       return (
-        (
-          (
-            answers.initUserFlow === initUserFlowChoices.businesses
-            && answers.isApplyingFilter
-            && answers.appliedBusinessFilters.indexOf('Location') !== -1
-          )
-          ||
-          (
-            answers.initUserFlow === initUserFlowChoices.reviews
-            && answers.appliedReviewFilters.indexOf('Location') !== -1
-          )
-        )
-        && answers.locationType === locationChoices.stateCode
+        ((answers.initUserFlow === initUserFlowChoices.businesses &&
+          answers.isApplyingFilter &&
+          answers.appliedBusinessFilters.indexOf('Location') !== -1) ||
+          (answers.initUserFlow === initUserFlowChoices.reviews &&
+            answers.appliedReviewFilters.indexOf('Location') !== -1)) &&
+        answers.locationType === locationChoices.stateCode
       );
-    }
+    },
   },
   {
     type: 'input',
@@ -122,21 +114,14 @@ const prompts = [
     message: 'Please enter postal code:',
     when: function (answers) {
       return (
-        (
-          (
-            answers.initUserFlow === initUserFlowChoices.businesses
-            && answers.isApplyingFilter
-            && answers.appliedBusinessFilters.indexOf('Location') !== -1
-          )
-          ||
-          (
-            answers.initUserFlow === initUserFlowChoices.reviews
-            && answers.appliedReviewFilters.indexOf('Location') !== -1
-          )
-        )
-        && answers.locationType === locationChoices.postalCode
+        ((answers.initUserFlow === initUserFlowChoices.businesses &&
+          answers.isApplyingFilter &&
+          answers.appliedBusinessFilters.indexOf('Location') !== -1) ||
+          (answers.initUserFlow === initUserFlowChoices.reviews &&
+            answers.appliedReviewFilters.indexOf('Location') !== -1)) &&
+        answers.locationType === locationChoices.postalCode
       );
-    }
+    },
   },
   {
     type: 'input',
@@ -144,39 +129,46 @@ const prompts = [
     message: 'Please enter star rating:',
     when: function (answers) {
       return (
-          (
-            answers.initUserFlow === initUserFlowChoices.businesses
-            && answers.isApplyingFilter
-            && answers.appliedBusinessFilters.indexOf('Average star rating') !== -1
-          )
-          ||
-          (
-            answers.initUserFlow === initUserFlowChoices.reviews
-            && answers.appliedReviewFilters.indexOf('Average star rating') !== -1
-          )
+        (answers.initUserFlow === initUserFlowChoices.businesses &&
+          answers.isApplyingFilter &&
+          answers.appliedBusinessFilters.indexOf('Average star rating') !==
+            -1) ||
+        (answers.initUserFlow === initUserFlowChoices.reviews &&
+          answers.appliedReviewFilters.indexOf('Average star rating') !== -1)
       );
-    }
+    },
   },
   {
     type: 'input',
     name: 'numberOfReviews',
     message: 'Please enter number of reviews',
     when: function (answers) {
-      return answers.initUserFlow === initUserFlowChoices.businesses
-      && answers.isApplyingFilter
-      && answers.appliedBusinessFilters.indexOf('Has X number of reviews') !== -1;
-    }
-  }
+      return (
+        answers.initUserFlow === initUserFlowChoices.businesses &&
+        answers.isApplyingFilter &&
+        answers.appliedBusinessFilters.indexOf('Has X number of reviews') !== -1
+      );
+    },
+  },
 ];
 
 async function runCliPrompts() {
   const answers = await inquirer.prompt(prompts);
 
+  const hasBusFilters =
+    answers.initUserFlow === initUserFlowChoices.businesses &&
+    answers.isApplyingFilter;
+
   if (answers.testQueries) {
-    await handleTestQuery(answers.testQueries)
+    await handleTestQuery(answers.testQueries);
+  } else if (hasBusFilters) {
+    handleBusinessQuery(answers);
+  } else if (answers.initUserFlow === initUserFlowChoices.reviews) {
+    handleReviewQuery(answers);
   } else {
     console.log(answers);
   }
+  return;
 }
 
 module.exports = runCliPrompts;
