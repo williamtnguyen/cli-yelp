@@ -1,9 +1,12 @@
-const { buildBusQueryObj } = require('./query-builder');
 const Business = require('../schemas/business-clean');
 
-async function handleBusinessQuery(userInputObj) {
+async function handleManualBusQuery(userInputObj) {
   try {
-    const queryObj = buildBusQueryObj(userInputObj);
+    const queryObj = {
+      $text: {
+        $search: userInputObj['manualBusinessQuery'],
+      },
+    };
     const result = await Business.find(queryObj).limit(5);
     console.log(result);
   } catch (error) {
@@ -11,4 +14,4 @@ async function handleBusinessQuery(userInputObj) {
   }
 }
 
-module.exports = handleBusinessQuery;
+module.exports = handleManualBusQuery;

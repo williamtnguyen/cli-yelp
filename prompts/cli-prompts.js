@@ -10,9 +10,11 @@ const {
 const handleTestQuery = require('../db/query-handlers/test-query-handler');
 const handleBusinessQuery = require('../db/query-handlers/business-query-handler');
 const handleReviewQuery = require('../db/query-handlers/review-query-handler');
+const handleManualBusQuery = require('../db/query-handlers/manual-business-query');
 
 console.log('Welcome to CLI Yelp!\n');
 
+inquirer.registerPrompt('date', require('inquirer-date-prompt'));
 const prompts = [
   {
     type: 'list',
@@ -23,7 +25,7 @@ const prompts = [
   {
     type: 'input',
     name: 'manualBusinessQuery',
-    message: 'Please submit a query:',
+    message: 'Please submit a keyword or business name:',
     when: function (answers) {
       return answers.initUserFlow === initUserFlowChoices.manual;
     },
@@ -110,8 +112,8 @@ const prompts = [
   },
   {
     type: 'input',
-    name: 'locationPostalCode',
-    message: 'Please enter postal code:',
+    name: 'locationCoordinates',
+    message: 'Please enter coordinates (long, lat):',
     when: function (answers) {
       return (
         ((answers.initUserFlow === initUserFlowChoices.businesses &&
@@ -119,7 +121,22 @@ const prompts = [
           answers.appliedBusinessFilters.indexOf('Location') !== -1) ||
           (answers.initUserFlow === initUserFlowChoices.reviews &&
             answers.appliedReviewFilters.indexOf('Location') !== -1)) &&
-        answers.locationType === locationChoices.postalCode
+        answers.locationType === locationChoices.latLngCoord
+      );
+    },
+  },
+  {
+    type: 'input',
+    name: 'maxDistanceFromCoordinates',
+    message: 'Please the max distance willing to travel (meters):',
+    when: function (answers) {
+      return (
+        ((answers.initUserFlow === initUserFlowChoices.businesses &&
+          answers.isApplyingFilter &&
+          answers.appliedBusinessFilters.indexOf('Location') !== -1) ||
+          (answers.initUserFlow === initUserFlowChoices.reviews &&
+            answers.appliedReviewFilters.indexOf('Location') !== -1)) &&
+        answers.locationType === locationChoices.latLngCoord
       );
     },
   },
@@ -146,7 +163,21 @@ const prompts = [
       return (
         answers.initUserFlow === initUserFlowChoices.businesses &&
         answers.isApplyingFilter &&
-        answers.appliedBusinessFilters.indexOf('Has X number of reviews') !== -1
+        answers.appliedBusinessFilters.indexOf(
+          'Has greater than X number of reviews'
+        ) !== -1
+      );
+    },
+  },
+  {
+    type: 'date',
+    name: 'timestamp',
+    message: 'Please enter date',
+    format: { month: 'short', hour: undefined, minute: undefined },
+    when: function (answers) {
+      return (
+        answers.initUserFlow === initUserFlowChoices.reviews &&
+        answers.appliedReviewFilters.indexOf('Posted after date X') !== -1
       );
     },
   },
@@ -161,6 +192,8 @@ async function runCliPrompts() {
 
   if (answers.testQueries) {
     await handleTestQuery(answers.testQueries);
+  } else if (answers.initUserFlow === initUserFlowChoices.manual) {
+    handleManualBusQuery(answers);
   } else if (hasBusFilters) {
     handleBusinessQuery(answers);
   } else if (answers.initUserFlow === initUserFlowChoices.reviews) {

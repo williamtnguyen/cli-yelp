@@ -32,10 +32,10 @@ function transformCoordsToGeoJSON(yelpBusObj) {
   if (yelpBusObj['latitude'] && yelpBusObj['longitude']) {
     yelpBusObj.location = {
       type: 'Point',
-      coordinates: [yelpBusObj['latitude'], yelpBusObj['longitude']],
+      coordinates: [yelpBusObj['longitude'], yelpBusObj['latitude']],
     };
-    delete yelpBusObj['latitude'];
     delete yelpBusObj['longitude'];
+    delete yelpBusObj['latitude'];
 
     return yelpBusObj;
   }

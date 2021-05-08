@@ -3,7 +3,21 @@ function buildBusQueryObj(userInputObj) {
   userInputObj.appliedBusinessFilters.forEach((filter) => {
     switch (filter) {
       case 'Location':
-      // TODO
+        switch (userInputObj.locationType) {
+          case '2 character state code':
+            queryObj['state'] = userInputObj['locationStateCode'];
+            break;
+          case 'Latitude/longitude coordinates':
+            const coordinates = userInputObj['locationCoordinates'].split(',');
+            queryObj['location'] = {
+              $near: {
+                $geometry: { type: 'Point', coordinates },
+                $maxDistance: userInputObj['maxDistanceFromCoordinates'],
+              },
+            };
+            break;
+        }
+        break;
       case 'Average star rating':
         queryObj['stars'] = userInputObj['averageStarRating'];
         break;
@@ -13,8 +27,8 @@ function buildBusQueryObj(userInputObj) {
       case 'Is open for business':
         queryObj['is_open'] = 1;
         break;
-      case 'Has X number of reviews':
-        queryObj['review_count'] = userInputObj['numberOfReviews'];
+      case 'Has greater than X number of reviews':
+        queryObj['review_count'] = { $gte: userInputObj['numberOfReviews'] };
         break;
       case 'Allows dogs':
         queryObj['attributes.DogsAllowed'] = 'True';
@@ -35,24 +49,55 @@ function buildRevQueryObj(userInputObj) {
     businessFilter: {},
     reviewFilter: {},
   };
-  appliedReviewFilters.forEach((filter) => {
+  userInputObj.appliedReviewFilters.forEach((filter) => {
     switch (filter) {
       case 'Location':
-      // TODO
+        switch (userInputObj.locationType) {
+          case '2 character state code':
+            queryBundle['businessFilter']['state'] =
+              userInputObj['locationStateCode'];
+            break;
+          case 'Latitude/longitude coordinates':
+            const coordinates = userInputObj['locationCoordinates'].split(',');
+            queryBundle['businessFilter']['location'] = {
+              $near: {
+                $geometry: { type: 'Point', coordinates },
+                $maxDistance: userInputObj['maxDistanceFromCoordinates'],
+              },
+            };
+            break;
+        }
+        break;
       case 'Average star rating':
         queryBundle['businessFilter']['stars'] =
           userInputObj['averageStarRating'];
-      case 'Bad review sentiment':
-      // TODO
+        break;
+      case 'Good review sentiment':
+        queryBundle['reviewFilter'] = {
+          $text: {
+            $search: 'good',
+          },
+        };
+        break;
       case 'Posted after date X':
-      // TODO
+        queryBundle['reviewFilter'] = {
+          date: {
+            $gte: new Date(userInputObj['timestamp']),
+          },
+        };
+        break;
       case 'Has delivery service':
         queryBundle['businessFilter']['attributes.RestaurantsDelivery'] =
           'True';
+        break;
       case 'Serves alcohol':
-      // TODO
+        queryBundle['businessFilter']['attributes.Alcohol'] = {
+          $ne: "u'none",
+        };
+        break;
     }
   });
+  return queryBundle;
 }
 
 module.exports = {

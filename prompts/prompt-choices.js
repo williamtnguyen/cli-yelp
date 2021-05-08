@@ -22,7 +22,7 @@ const businessFilterChoices = [
   { name: 'Average star rating' },
   { name: 'Has delivery service' },
   { name: 'Is open for business' },
-  { name: 'Has X number of reviews' },
+  { name: 'Has greater than X number of reviews' },
   { name: 'Allows dogs' },
   { name: 'Accepts credit card' }, // location 2 options
   { name: 'Has happy hour' }, // location 2 options
@@ -30,14 +30,14 @@ const businessFilterChoices = [
 const reviewFilterChoices = [
   { name: 'Location' },
   { name: 'Average star rating' }, // location 2 options
-  { name: 'Bad review sentiment' },
+  { name: 'Good review sentiment' },
   { name: 'Posted after date X' }, // still needa make prompt for this
   { name: 'Has delivery service' },
   { name: 'Serves alcohol' },
 ];
 const locationChoices = {
   stateCode: '2 character state code',
-  postalCode: 'Postal code',
+  latLngCoord: 'Latitude/longitude coordinates',
 };
 
 module.exports = {

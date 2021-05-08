@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "inquirer": "^8.0.0",
+    "inquirer-date-prompt": "^2.0.0",
     "mongoose": "^5.12.5"
   }
 }
