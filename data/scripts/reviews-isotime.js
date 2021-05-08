@@ -1,6 +1,7 @@
 const fs = require('fs');
 const Review = require('../../db/schemas/review-clean');
 const connectToMongo = require('../../db/connect-to-mongo');
+require('dotenv').config();
 
 // processes 7GB dataset by streaming the file
 // rather than running fully buffered function call

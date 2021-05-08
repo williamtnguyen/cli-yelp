@@ -4,11 +4,14 @@
   "description": "a cli based yelp app that interfaces a sharded MongoDB cluster of 5 AWS EC2 nodes",
   "main": "app.js",
   "scripts": {
+    "dev": "node app.js",
+    "prod": "NODE_ENV=production node app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "dotenv": "^9.0.0",
     "inquirer": "^8.0.0",
     "inquirer-date-prompt": "^2.0.0",
     "mongoose": "^5.12.5"
